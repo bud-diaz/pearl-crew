@@ -1,14 +1,16 @@
-# pearl-crew
+# Pearl Crew — Discord Multi-Agent Bot
+
 A 5-agent local AI crew running on Ollama, accessible from anywhere via Discord.
+
 ## Agents
 
 | Agent | Role | Default Model |
 |-------|------|---------------|
-| Pearl | Orchestrator & Visionary | dolphin-llama3 |
-| Corey | Creative & Artist | dolphin-llama3 |
-| Midas | Marketing & Brand Builder | dolphin-llama3 |
+| Pearl | Orchestrator & Visionary | hermes3 |
+| Corey | Creative & Artist | hermes3 |
+| Midas | Marketing & Brand Builder | hermes3 |
 | Rain  | Technical Engineer | hermes3 |
-| Levy  | Monetization, Legal & Compliance | dolphin-llama3 |
+| Levy  | Monetization, Legal & Compliance | hermes3 |
 
 ---
 
@@ -23,7 +25,7 @@ pip install -r requirements.txt
 ### 2. Pull your Ollama model
 
 ```bash
-ollama pull dolphin-llama3
+ollama pull hermes3
 # or whatever model you're using
 ```
 
