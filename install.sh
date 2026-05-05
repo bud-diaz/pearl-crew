@@ -89,6 +89,16 @@ mkdir -p "$INSTALL_DIR/workspace"
 mkdir -p "$INSTALL_DIR/data/history"
 info "workspace/ and data/history/ created"
 
+# Skills directories
+mkdir -p "$INSTALL_DIR/skills/shared"
+mkdir -p "$INSTALL_DIR/skills/pearl"
+mkdir -p "$INSTALL_DIR/skills/corey"
+mkdir -p "$INSTALL_DIR/skills/midas"
+mkdir -p "$INSTALL_DIR/skills/rain"
+mkdir -p "$INSTALL_DIR/skills/levy"
+info "skills/ directory structure created"
+warn "Browse skills at clawhub.ai — download a skill folder into ./skills/shared/ or ./skills/<agent>/"
+
 # ── 6. Environment file ───────────────────────────────────────────────────────
 section "Environment Config"
 if [ -f "$INSTALL_DIR/.env" ]; then

@@ -89,6 +89,63 @@ python bot.py
 
 ---
 
+## Skills
+
+Skills are plug-in capability documents that extend what an agent knows how to do. Each skill is a folder containing a `SKILL.md` file — plain text that gets injected into the agent's system prompt at the start of every response, so the agent is aware of it automatically without any tool calls.
+
+### Directory layout
+
+```
+skills/
+├── shared/          # loaded by ALL agents
+│   └── my-skill/
+│       └── SKILL.md
+├── pearl/           # Pearl-only skills
+├── corey/           # Corey-only
+├── midas/           # Midas-only
+├── rain/            # Rain-only
+└── levy/            # Levy-only
+```
+
+### Installing from ClawhHub
+
+Browse skills at [clawhub.ai](https://clawhub.ai). Download a skill folder and place it in the appropriate subdirectory:
+
+```bash
+# A skill for all agents
+cp -r ~/Downloads/my-skill skills/shared/
+
+# A skill only Rain should know about
+cp -r ~/Downloads/shell-tricks skills/rain/
+```
+
+After dropping in a new skill, either restart the bot or ask Pearl or Rain to run the `reload_skills` tool — they'll pick it up instantly without a restart.
+
+### Commands
+
+```
+!crew skills              — list all loaded skills across every agent
+!crew skills rain         — list skills loaded for Rain specifically
+```
+
+### The reload_skills tool
+
+Pearl and Rain both have access to a `reload_skills` tool. If you install a new skill while the bot is running, just say:
+
+```
+#pearl  → reload your skills
+```
+
+Pearl will call `reload_skills` and confirm what was loaded.
+
+### Notes
+
+- Skills are injected into the system prompt at the start of each response — no extra tool calls needed.
+- Total injected skill content is capped at ~6000 characters to avoid context bloat.
+- The bot works normally with an empty `skills/` directory.
+
+---
+
 ## File Structure
 
 ```

@@ -14,13 +14,14 @@ Usage:
   !crew ls [path]                 — list files in workspace/ (or a subdirectory)
   !crew ping                      — quick check that Ollama is reachable
   !crew reload                    — reload agent definitions from memory (no restart needed)
+  !crew skills [agent]            — list loaded skills (optionally for a specific agent)
 """
 
 import os
 import ollama
 import subprocess
 from pathlib import Path
-from agents import AGENTS
+from agents import AGENTS, skill_loader
 from history import HistoryManager
 from tools import FILES_ROOT
 
@@ -109,6 +110,11 @@ async def handle_command(content: str, user_id: str, user_name: str) -> str:
         names = ", ".join(AGENTS.keys())
         return f"✓ {count} agents active: {names}. (No restart needed — models and settings are live.)"
 
+    # ── !crew skills [agent] ──────────────────────────────────────────────────
+    elif cmd == "skills":
+        agent_name = parts[2].lower() if len(parts) > 2 else None
+        return _skills(agent_name)
+
     else:
         return f"Unknown command `{cmd}`. Try `!crew help`."
 
@@ -122,6 +128,7 @@ def _help() -> str:
         "  `!crew status` — check Ollama and loaded models\n"
         "  `!crew tools <agent>` — show what tools an agent has\n"
         "  `!crew model <agent> <model>` — hot-swap an agent's model\n"
+        "  `!crew skills [agent]` — list loaded skills (all or per agent)\n"
         "  `!crew ping` — quick Ollama health check\n"
         "  `!crew ls [path]` — list files in workspace/\n"
         "  `!crew history` — show how many messages are in your history\n"
@@ -130,6 +137,31 @@ def _help() -> str:
         "  `!crew reload` — confirm agents are live without restarting\n"
         "  `!crew help` — show this message"
     )
+
+
+def _skills(agent_name: str | None) -> str:
+    if agent_name and agent_name not in AGENTS:
+        return f"No agent named '{agent_name}'. Try: {', '.join(AGENTS.keys())}"
+
+    skill_map = skill_loader.list_skills(agent_name)
+
+    if not any(skill_map.values()):
+        if agent_name:
+            return f"No skills loaded for **{agent_name}**. Drop a skill folder into `skills/{agent_name}/` or `skills/shared/`."
+        return "No skills loaded. Browse skills at clawhub.ai and drop skill folders into `skills/shared/` or `skills/<agent>/`."
+
+    lines = ["**Loaded skills:**\n```"]
+    for name, names in sorted(skill_map.items()):
+        if names:
+            lines.append(f"{name}:")
+            for skill in names:
+                lines.append(f"  • {skill}")
+    lines.append("```")
+
+    output = "\n".join(lines)
+    if len(output) > 1800:
+        output = output[:1797] + "…"
+    return output
 
 
 def _status() -> str:

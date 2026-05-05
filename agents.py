@@ -11,6 +11,9 @@ import ollama
 import json
 from history import HistoryManager
 from tools import TOOL_SCHEMAS, execute_tool
+from skills import SkillLoader
+
+skill_loader = SkillLoader()
 
 
 # ── Crew roster description (injected into every agent's system prompt) ──────
@@ -47,6 +50,8 @@ class Agent:
             if self.unrestricted
             else "File access is sandboxed to the ./workspace/ directory."
         )
+        skills_block = skill_loader.get(self.name)
+        skills_section = f"\n\n{skills_block}" if skills_block else ""
         return (
             f"You are {self.name}, {self.role}.\n"
             f"{self.persona}\n\n"
@@ -54,6 +59,7 @@ class Agent:
             f"Available tools: {tool_names}.\n"
             f"{sandbox_note}\n"
             f"Be direct, focused, and true to your role."
+            f"{skills_section}"
         )
 
     @property
@@ -133,7 +139,7 @@ AGENTS: dict[str, Agent] = {
             "You have full unrestricted access to the device."
         ),
         model="dolphin-llama3",
-        tools=["web_search", "read_file", "write_file", "run_shell", "switch_model"],
+        tools=["web_search", "read_file", "write_file", "run_shell", "switch_model", "reload_skills"],
         unrestricted=True,
     ),
 
@@ -172,7 +178,7 @@ AGENTS: dict[str, Agent] = {
             "You have full unrestricted access to the device."
         ),
         model="dolphin-mistral",
-        tools=["web_search", "read_file", "write_file", "run_shell", "switch_model"],
+        tools=["web_search", "read_file", "write_file", "run_shell", "switch_model", "reload_skills"],
         unrestricted=True,
     ),
 

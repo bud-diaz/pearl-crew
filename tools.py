@@ -18,6 +18,11 @@ import os
 import requests
 from pathlib import Path
 
+# Imported lazily at call time to avoid circular imports at module load
+def _get_skill_loader():
+    from skills import skill_loader as _sl
+    return _sl
+
 # ── Configurable ─────────────────────────────────────────────────────────────
 
 FILES_ROOT = Path(os.getenv("FILES_ROOT", "./workspace"))
@@ -127,6 +132,18 @@ TOOL_SCHEMAS = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "reload_skills",
+            "description": "Reload all skills from disk. Use after installing a new skill from ClawhHub.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+            },
+        },
+    },
 ]
 
 
@@ -152,6 +169,8 @@ def execute_tool(name: str, args: dict, unrestricted: bool = False) -> str:
             )
         elif name == "switch_model":
             return tool_switch_model(args.get("model_name", ""))
+        elif name == "reload_skills":
+            return _get_skill_loader().reload()
         else:
             return f"Unknown tool: {name}"
     except Exception as e:
