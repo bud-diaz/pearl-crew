@@ -84,11 +84,19 @@ class Agent:
 
         MAX_TOOL_ROUNDS = 5
         for _ in range(MAX_TOOL_ROUNDS):
-            response = ollama.chat(
-                model=self.model,
-                messages=[{"role": "system", "content": self.system_prompt}] + messages,
-                tools=self.tool_schemas if self.tool_schemas else None,
-            )
+            try:
+                response = ollama.chat(
+                    model=self.model,
+                    messages=[{"role": "system", "content": self.system_prompt}] + messages,
+                    tools=self.tool_schemas if self.tool_schemas else None,
+                )
+            except ollama.ResponseError as e:
+                if "does not support tools" not in str(e):
+                    raise
+                response = ollama.chat(
+                    model=self.model,
+                    messages=[{"role": "system", "content": self.system_prompt}] + messages,
+                )
 
             msg = response.message
 
